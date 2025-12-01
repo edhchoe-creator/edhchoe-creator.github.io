@@ -1,0 +1,16 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["U7HQPTBTPZ.com.edhchoe.countdownready"],
+        "components": [
+          {
+            "/": "/CountDownReady/*",
+            "comment": "Handle all links under /CountDownReady/"
+          }
+        ]
+      }
+    ]
+  }
+}
