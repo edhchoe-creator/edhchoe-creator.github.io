@@ -5,13 +5,12 @@
       {
         "appIDs": ["U7HQPTBTPZ.com.edhchoe.countdownready"],
         "components": [
-          {
-            "/": "/CountDownReady/*",
-            "comment": "Handle all links under /CountDownReady/"
-          }
+          { "/": "/CountDownReady", "comment": "Exact /CountDownReady" },
+          { "/": "/CountDownReady/", "comment": "Exact /CountDownReady/ (with slash)" },
+          { "/": "/CountDownReady/index.html", "comment": "Explicit index file" },
+          { "/": "/CountDownReady/*", "comment": "Any subpath under /CountDownReady/" }
         ]
       }
     ]
   }
 }
- 
