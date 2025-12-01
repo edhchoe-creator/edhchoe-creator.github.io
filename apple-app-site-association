@@ -1,1 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CountDownReady</title>
+  <meta name="description" content="Share and view countdowns." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="CountDownReady" />
+  <meta property="og:description" content="A shared countdown is waiting for you." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://edhchoe-creator.github.io/CountDownReady/" />
+  <meta property="og:image" content="appicon.png" />
+
+  <style>
+    body { font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background: #0e0f19; color: #fff; }
+    .container { max-width: 720px; margin: 0 auto; padding: 24px; text-align: center; }
+    .card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 20px; margin-top: 20px; }
+    h1 { margin: 8px 0 4px; font-size: 28px; }
+    .subtitle { color: rgba(255,255,255,0.8); margin-bottom: 16px; }
+    .countdown { font-size: 36px; font-weight: 800; letter-spacing: 1px; }
+    .target { color: rgba(255,255,255,0.8); margin-top: 8px; }
+    .buttons { display: flex; gap: 12px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+    .button { padding: 12px 16px; border-radius: 12px; text-decoration: none; color: #fff; border: 1px solid rgba(255,255,255,0.18); }
+    .primary { background: linear-gradient(135deg, #4d7cff, #b36bff); }
+    .secondary { background: rgba(255,255,255,0.08); }
+    .error { color: #ff8a8a; }
+    img.icon { width: 84px; height: 84px; border-radius: 20px; box-shadow: 0 10px 22px rgba(0,0,0,0.35); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="appicon.png" alt="App Icon" class="icon" onerror="this.style.display='none'" />
+    <h1 id="title">Countdown</h1>
+    <div class="subtitle">Shared via CountDownReady</div>
+
+    <div class="card">
+      <div id="countdown" class="countdown">--:--:--</div>
+      <div id="target" class="target"></div>
+      <div id="error" class="error"></div>
+
+      <div class="buttons">
+        <a id="openApp" class="button primary" href="#">Open in App</a>
+        <a id="getApp" class="button secondary" href="https://apps.apple.com/app/idYOUR_APP_ID" target="_blank" rel="noopener">Get the App</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const title = params.get('title') || 'Countdown';
+      const endStr = params.get('end');
+      const tz = params.get('tz') || 'UTC';
+      const style = params.get('style') || 'default';
+
+      document.getElementById('title').textContent = title;
+
+      let endDate = null;
+      if (endStr) {
+        // Parse ISO8601
+        const parsed = Date.parse(endStr);
+        if (!isNaN(parsed)) {
+          endDate = new Date(parsed);
+        }
+      }
+
+      const target = document.getElementById('target');
+      const countdown = document.getElementById('countdown');
+      const errorEl = document.getElementById('error');
+
+      function formatTarget(d) {
+        try {
+          return new Intl.DateTimeFormat(undefined, { dateStyle: 'full', timeStyle: 'short', timeZone: tz }).format(d);
+        } catch {
+          return d.toLocaleString();
+        }
+      }
+
+      function tick() {
+        if (!endDate) { countdown.textContent = '--:--:--'; return; }
+        const now = new Date();
+        const diff = Math.max(0, Math.floor((endDate.getTime() - now.getTime())/1000));
+        const h = Math.floor(diff / 3600);
+        const m = Math.floor((diff % 3600) / 60);
+        const s = diff % 60;
+        countdown.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      }
+
+      if (!endDate) {
+        errorEl.textContent = 'Missing or invalid end parameter. Expected ISO-8601 timestamp.';
+      } else {
+        target.textContent = `Ends • ${formatTarget(endDate)} (${tz})`;
+        setInterval(tick, 1000);
+        tick();
+      }
+
+      // Universal Link button
+      const universal = `https://edhchoe-creator.github.io/CountDownReady/?title=${encodeURIComponent(title)}&end=${encodeURIComponent(endStr || '')}&tz=${encodeURIComponent(tz)}&style=${encodeURIComponent(style)}`;
+      const openApp = document.getElementById('openApp');
+      openApp.href = universal;
+
+      // Optional: attempt auto-open, fallback to App Store after delay
+      // setTimeout(function(){ window.location.href = universal; setTimeout(function(){ window.location.href = 'https://apps.apple.com/app/idYOUR_APP_ID'; }, 1500); }, 300);
+    })();
+  </script>
+</body>
+</html>
 
