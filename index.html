@@ -1,59 +1,215 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Countdown</title>
 
-<!-- RICH PREVIEW -->
-<meta property="og:title" content="Countdown Ready">
-<meta property="og:description" content="Your friend shared a countdown with you. Install the app to view it.">
-<meta property="og:image" content="https://edhchoe-creator.github.io/CountDownReady/appicon.png">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-
-<title>Countdown Ready</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Optional Smart App Banner (see section B) -->
+<!-- <meta name="apple-itunes-app" content="app-id=6755545385, affiliate-data=, app-argument=https://edhchoe-creator.github.io/CountDownReady/"> -->
 
 <style>
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-        text-align: center;
-        padding: 40px;
-        background: #f5f5f7;
-    }
-    img {
-        width: 120px;
-        border-radius: 24px;
-        margin-bottom: 24px;
-    }
-    a.button {
-        display: inline-block;
-        padding: 14px 22px;
-        background: #007aff;
-        color: white;
-        border-radius: 12px;
-        font-size: 18px;
-        text-decoration: none;
-    }
+  :root {
+    color-scheme: light dark;
+    --bg: #0a0b10;
+    --card: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.15);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.75);
+    --accentA: #4ea8ff;
+    --accentB: #b579ff;
+  }
+  body {
+    margin: 0;
+    font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(140deg, #0b1022, #141827 60%, #0e0f15);
+    color: var(--text);
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
+  .container {
+    width: 100%;
+    max-width: 640px;
+  }
+  .card {
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+  .header {
+    padding: 18px 20px;
+    background: linear-gradient(135deg, var(--accentA), var(--accentB));
+  }
+  .title {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0;
+  }
+  .content {
+    padding: 18px 20px 10px;
+  }
+  .row {
+    margin: 8px 0;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .count {
+    font-size: 34px;
+    font-weight: 900;
+    margin: 10px 0 4px;
+  }
+  .buttons {
+    display: flex;
+    gap: 10px;
+    padding: 14px 16px 18px;
+  }
+  .btn {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-weight: 700;
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.08s ease, background 0.2s ease, border-color 0.2s ease;
+    user-select: none;
+  }
+  .btn.primary {
+    background: linear-gradient(135deg, var(--accentA), var(--accentB));
+    border-color: transparent;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+
+  .hint {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 6px;
+  }
 </style>
 </head>
-
 <body>
+  <div class="container">
+    <div class="card" id="card">
+      <div class="header">
+        <h1 class="title" id="title">Countdown</h1>
+      </div>
+      <div class="content">
+        <div class="row">Target (local time): <span id="targetLocal"></span></div>
+        <div class="row">Time zone: <span id="tzSpan"></span></div>
+        <div class="count" id="remaining">--</div>
+      </div>
+      <div class="buttons">
+        <a class="btn primary" id="openAppBtn" href="#">Open in App</a>
+        <a class="btn" id="getAppBtn" href="https://apps.apple.com/us/app/countdownready/id6755545385">Get the App</a>
+      </div>
+      <div class="hint" id="hint">If nothing happens, tap “Get the App” to install, then come back and tap “Open in App”.</div>
+    </div>
+  </div>
 
-    <img src="appicon.png" alt="App Icon"/>
+<script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const title = params.get('title') || 'Countdown';
+  const endISO = params.get('end'); // ISO-8601 UTC (e.g., 2026-01-01T00:00:00Z)
+  const tz = params.get('tz') || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    <h1>Countdown Ready</h1>
-    <p>Your friend shared a countdown with you.</p>
-    <p>Install the app to view and track it together.</p>
+  const titleEl = document.getElementById('title');
+  const targetLocalEl = document.getElementById('targetLocal');
+  const tzEl = document.getElementById('tzSpan');
+  const remainingEl = document.getElementById('remaining');
+  const openAppBtn = document.getElementById('openAppBtn');
 
-    <br>
+  titleEl.textContent = title;
+  tzEl.textContent = tz;
 
-    <!-- 🔥 Replace this placeholder once your app is live -->
-    <a class="button" href="https://apps.apple.com/app/id6755545385">Get the App</a>
+  let endDate = null;
+  if (endISO) {
+    endDate = new Date(endISO); // ISO → Date
+    if (!isNaN(endDate.getTime())) {
+      targetLocalEl.textContent = endDate.toLocaleString();
+    } else {
+      targetLocalEl.textContent = 'Invalid date';
+    }
+  } else {
+    targetLocalEl.textContent = 'Unknown';
+  }
 
-    <br><br>
+  // Countdown tick
+  function updateRemaining() {
+    if (!endDate) {
+      remainingEl.textContent = '--';
+      return;
+    }
+    const now = new Date();
+    const diff = Math.max(0, endDate.getTime() - now.getTime());
 
-    <!-- Optional: open in app if installed -->
-    <a class="button" href="countdownready://">Open in App</a>
+    const seconds = Math.floor(diff / 1000);
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
 
+    if (days >= 1) {
+      remainingEl.textContent = `${days} day${days === 1 ? '' : 's'}`;
+    } else if (hours >= 1) {
+      remainingEl.textContent = `${hours} hour${hours === 1 ? '' : 's'}`;
+    } else {
+      remainingEl.textContent = `${minutes} minute${minutes === 1 ? '' : 's'}`;
+    }
+  }
+  updateRemaining();
+  setInterval(updateRemaining, 1000 * 30);
+
+  // Build custom scheme deep link for immediate import inside the app
+  function buildCustomSchemeURL() {
+    const iso = endISO || new Date().toISOString();
+    const scheme = 'countdownready://import';
+    const q = new URLSearchParams({ title, date: iso });
+    return `${scheme}?${q.toString()}`;
+  }
+
+  // D. “Open in App” button
+  openAppBtn.setAttribute('href', buildCustomSchemeURL());
+
+  // C. Optional auto-open custom scheme with fallback
+  function attemptOpenAppWithFallback() {
+    const href = buildCustomSchemeURL();
+    const start = Date.now();
+    let didChange = false;
+
+    const hiddenIframe = document.createElement('iframe');
+    hiddenIframe.style.display = 'none';
+    hiddenIframe.src = href;
+
+    // Fallback after 1400ms if the app did not open
+    const t = setTimeout(function() {
+      const elapsed = Date.now() - start;
+      if (elapsed < 1600 && !didChange) {
+        // App likely not installed → suggest installing
+        window.location.href = 'https://apps.apple.com/us/app/countdownready/id6755545385';
+      }
+    }, 1400);
+
+    // Some browsers emit blur/pagehide when switching to app
+    window.addEventListener('pagehide', function() {
+      didChange = true;
+      clearTimeout(t);
+    }, { once: true });
+
+    document.body.appendChild(hiddenIframe);
+  }
+
+  // Optional: trigger auto-open once on load if we have enough params
+  // Uncomment to enable auto-open on first visit:
+  // if (title && endISO) { attemptOpenAppWithFallback(); }
+})();
+</script>
 </body>
 </html>
